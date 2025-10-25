@@ -1,0 +1,44 @@
+.app-container {
+    display: flex; /* 子要素（カレンダーとコンテンツエリア）を縦に並べる */
+    flex-direction: column; /* 縦方向の配置を指定 */
+    height: 100vh; /* 画面いっぱいの高さを使用 */
+    max-width: 800px;
+    margin: 0 auto; /* 中央寄せ */
+}
+
+/* 上半分：カレンダーエリア */
+.calendar-area {
+    flex: 1; /* 縦方向のスペースの1/2を使用 */
+    padding: 20px;
+    border-bottom: 2px solid #333; /* 上下分割の線 */
+}
+
+/* 下半分：コンテンツエリア */
+.content-area {
+    flex: 1; /* 縦方向の残りの1/2を使用 */
+    display: flex; /* 子要素（予定とToDo）を横に並べる */
+}
+
+/* 左下：その日の予定 */
+.today-schedule {
+    flex: 1; /* 横方向のスペースの1/2を使用 */
+    padding: 20px;
+    border-right: 1px solid #ccc; /* 左右分割の線 */
+}
+
+/* 右下：ToDoリスト */
+.todoList {
+    flex: 1; /* 横方向の残りの1/2を使用 */
+    padding: 20px;
+}
+
+/* カレンダーの基本的なスタイル */
+.calendar-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.calendar-table th, .calendar-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}

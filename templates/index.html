@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>予定管理アプリ - カレンダーとToDo</title>
+    <script src=""></script>
+    <style>
+        .app-container {
+            display: flex; /* 子要素（カレンダーとコンテンツエリア）を縦に並べる */
+            flex-direction: column; /* 縦方向の配置を指定 */
+            height: 100vh; /* 画面いっぱいの高さを使用 */
+            max-width: 800px;
+            margin: 0 auto; /* 中央寄せ */
+        }
+
+/* 上半分：カレンダーエリア */
+        .calendar-area {
+            flex: 1; /* 縦方向のスペースの1/2を使用 */
+            border-bottom: 2px solid #333; /* 上下分割の線 */
+            display: flex; /* Flexboxコンテナにする */
+            flex-direction: column; /* 縦方向に配置 */
+            /* paddingによって高さがオーバーしないようにする */
+            box-sizing: border-box;
+        }
+
+/* 下半分：コンテンツエリア */
+        .content-area {
+            flex: 1; /* 縦方向の残りの1/2を使用 */
+            display: flex; /* 子要素（予定とToDo）を横に並べる */
+        }
+
+/* 左下：その日の予定 */
+        .today-schedule {
+            width: 50%; /* 横幅の50%を使用 */
+            flex: 1; /* 横方向のスペースの1/2を使用 */
+            border-right: 1px solid #ccc; /* 左右分割の線 */
+            white-space: nowrap; /* テキストの折り返しを有効にする */
+            overflow: hidden; /* はみ出した部分を隠す */
+            text-overflow: ellipsis; /* はみ出した部分を省略記号で表示 */
+        }
+
+        .today-schedule p {
+            white-space: nowrap;      /* テキストの折り返しを禁止 */
+            overflow: hidden;         /* はみ出した部分を隠す */
+            text-overflow: ellipsis;  /* 省略記号(...)を表示 */
+        }
+
+/* 右下：ToDoリスト */
+        .todoList {
+            flex: 1; /* 横方向の残りの1/2を使用 */
+        }
+
+/* カレンダーの基本的なスタイル */
+        .calendar-table {
+            width: 100%;
+            border-collapse: collapse;
+            flex-grow: 1; /* 縦方向の残りのスペースを全て占有する */
+        }
+        .calendar-table th, .calendar-table td {
+            border: 5px solid #ddd;
+            padding: 8px;
+            height: 0;
+        }
+        /* テーブルの行も高さも均等に分配する */
+        .calendar-table tbody tr {
+            flex-grow: 1;
+    /* CSS Gridでは display: grid; grid-template-rows: repeat(5, 1fr); を table に適用できるが、
+       テーブル要素では非推奨のため、Flexboxで代替する。 */
+        }
+        .calendar-table tbody tr td {
+            text-align: initial; /* 日付を左寄せにする */
+            justify-content: flex-start; /* 左寄せ */
+            position: relative; /* 基準位置とする */
+            padding-top: 20px; /* 日付を置くスペースを確保するためにパディングを増やす */
+            text-align: center; /* 予定コンテンツを中央寄せにする場合 */
+        }
+
+/* 見出しのスペース調整 */
+        .calendar-area h2 {
+            margin-top: 0; /* 上部の隙間をなくす */
+        }
+        .date-number {
+            position: absolute; /* 親要素（td）を基準に絶対配置 */
+            top: 5px; /* 上端から5px */
+            left: 5px; /* 左端から5px */
+            font-size: 0.7em;
+            font-weight: bold;
+            color: #555;
+        }
+        .schedule-entry {
+            background-color: #f0f8ff;
+            margin-top: 0px;
+            padding: 0px 0px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        
+        <header class="calendar-area">
+            <h2 style="text-align: center">2025年10月</h2>
+            <table class="calendar-table">
+                <thead>
+                    <tr>
+                        <th>日</th>
+                        <th>月</th>
+                        <th>火</th>
+                        <th>水</th>
+                        <th>木</th>
+                        <th>金</th>
+                        <th>土</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <span class="date-number">29</span>
+                            <div class="schedule-entry">予定1</div>
+                        </td>
+                        <td>30</td>
+                        <td>1</td>
+                        <td>2</td>
+                        <td>3</td>
+                        <td>4</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>7</td>
+                        <td>8</td>
+                        <td>9</td>
+                        <td>10</td>
+                        <td>11</td>
+                        <td>12</td>
+                    </tr>
+                    <tr>
+                        <td>13</td>
+                        <td>14</td>
+                        <td>15</td>
+                        <td>16</td>
+                        <td>17</td>
+                        <td>18</td>
+                        <td>19</td>
+                    </tr>
+                    <tr>
+                        <td>20</td>
+                        <td>21</td>
+                        <td>22</td>
+                        <td>23</td>
+                        <td>24</td>
+                        <td>25</td>
+                        <td>26</td>
+                    </tr>
+                    <tr>
+                        <td>27</td>
+                        <td>28</td>
+                        <td>29</td>
+                        <td>30</td>
+                        <td>31</td>
+                        <td>1</td>
+                        <td>2</td>
+                    </tr>
+                </tbody>
+            </table>
+        </header>
+
+        <main class="content-area">
+            
+            <section class="today-schedule">
+                <h3>今日の予定</h3>
+                <p>予定がありません。asdjahsdfgkkgasddfjhgukjahgfdkjaskjdfhg</p>
+            </section>
+            
+            <section class="todoList">
+                <h3>ToDoリスト</h3>
+                <ul>
+                    <li>ToDo 項目 1</li>
+                    <li>ToDo 項目 2</li>
+                </ul>
+                <a href="base.html">新しいToDoを追加</a>
+                <button id="addTodo" class="button">新しいToDoを追加</button>
+            </section>
+            
+        </main>
+        
+    </div>
+</body>
+</html>
+
+<script>
+    let add = document.getElementById("addTodo");
+    add.addEventListener("click", function() {
+    // todoListセクションの中にある<ul>を取得
+        const todoList = document.querySelector(".todoList ul");
+        console.log("1");
+
+        let newTodo = document.createElement("li");
+        console.log("2");
+
+        newTodo.textContent = "新しいToDo項目";
+        console.log("newTodo");
+
+    // ulに追加！
+        todoList.appendChild(newTodo);
+    });
+</script>

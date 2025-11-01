@@ -187,7 +187,9 @@
                         <li>
                             <span class="todo-category {{ todo.item }}">{{ todo.item }}</span>
                             <strong>{{ todo.content }}</strong>
-                            <button class="delete-btn" data-id="{{ todo.id }}">削除</button>
+                            <a href="{{ url_for('delete_todo', todo_id=todo.id) }}" 
+                               class="btn-delete-small"
+                               onclick="return confirm('本当に削除しますか？')">削除</a>
                             <br>
                             <small>締切: {{ todo.starting_day.strftime('%Y/%m/%d') }}</small>
                             {% if todo.detail %}

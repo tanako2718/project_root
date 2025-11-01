@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>予定管理アプリ - カレンダーとToDo</title>
-    <script src=""></script>
+    <script src="../static/js/todo.js"></script>
     <style>
         .app-container {
             display: flex; /* 子要素（カレンダーとコンテンツエリア）を縦に並べる */
@@ -53,22 +53,26 @@
 
 /* カレンダーの基本的なスタイル */
         .calendar-table {
+            table-layout: fixed;
             width: 100%;
             border-collapse: collapse;
             flex-grow: 1; /* 縦方向の残りのスペースを全て占有する */
         }
         .calendar-table th, .calendar-table td {
+            table-layout: fixed;
             border: 5px solid #ddd;
             padding: 8px;
             height: 0;
         }
         /* テーブルの行も高さも均等に分配する */
         .calendar-table tbody tr {
+            table-layout: fixed;
             flex-grow: 1;
     /* CSS Gridでは display: grid; grid-template-rows: repeat(5, 1fr); を table に適用できるが、
        テーブル要素では非推奨のため、Flexboxで代替する。 */
         }
         .calendar-table tbody tr td {
+            table-layout: fixed;
             text-align: initial; /* 日付を左寄せにする */
             justify-content: flex-start; /* 左寄せ */
             position: relative; /* 基準位置とする */
@@ -80,7 +84,7 @@
         .calendar-area h2 {
             margin-top: 0; /* 上部の隙間をなくす */
         }
-        .date-number {
+        .date-number tr td span{
             position: absolute; /* 親要素（td）を基準に絶対配置 */
             top: 5px; /* 上端から5px */
             left: 5px; /* 左端から5px */
@@ -90,6 +94,7 @@
         }
         .schedule-entry {
             background-color: #f0f8ff;
+            width: auto;
             margin-top: 0px;
             padding: 0px 0px;
             border-radius: 4px;
@@ -114,18 +119,18 @@
                         <th>土</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="date-number">
                     <tr>
                         <td>
-                            <span class="date-number">29</span>
+                            <span>29</span>
                             <div class="schedule-entry">予定1</div>
                         </td>
-                        <td>30</td>
-                        <td>1</td>
-                        <td>2</td>
-                        <td>3</td>
-                        <td>4</td>
-                        <td>5</td>
+                        <td><span>30</span></td>
+                        <td><span>1</span></td>
+                        <td><span>2</span></td>
+                        <td><span>3</span></td>
+                        <td><span>4</span></td>
+                        <td><span>5</span></td>
                     </tr>
                     <tr>
                         <td>6</td>
@@ -176,34 +181,65 @@
             
             <section class="todoList">
                 <h3>ToDoリスト</h3>
-                <ul>
-                    <li>ToDo 項目 1</li>
-                    <li>ToDo 項目 2</li>
+                <ul id="todoListUl"> <!-- PythonのFlaskから渡されたtodosリストを表示 -->
+                    {% if todos %}
+                        {% for todo in todos %}
+                        <li>
+                            <span class="todo-category {{ todo.item }}">{{ todo.item }}</span>
+                            <strong>{{ todo.content }}</strong>
+                            <button class="delete-btn" data-id="{{ todo.id }}">削除</button>
+                            <br>
+                            <small>締切: {{ todo.starting_day.strftime('%Y/%m/%d') }}</small>
+                            {% if todo.detail %}
+                            <br>
+                            <small class="todo-detail-text">{{ todo.detail }}</small>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    {% else %}
+                        <li>Todoがありません</li>
+                    {% endif %}
                 </ul>
-                <a href="base.html">新しいToDoを追加</a>
-                <button id="addTodo" class="button">新しいToDoを追加</button>
+                <form method="POST" action="{{ url_for('add_todo') }}">
+            <div class="form-group">
+                <label for="item">項目 *</label>
+                <select name="item" id="item" required>
+                    <option value="">選択してください</option>
+                    <option value="学業">学業</option>
+                    <option value="バイト">バイト</option>
+                    <option value="サークル">サークル</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="content">予定 *</label>
+                <input type="text" name="content" id="content" required placeholder="例: 課題提出">
+            </div>
+
+            <div class="form-group">
+                <label for="detail">詳細</label>
+                <textarea name="detail" id="detail" rows="3" placeholder="詳細を入力（任意）"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="starting_day">締め切り *</label>
+                <input type="date" name="starting_day" id="starting_day" required>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" id="cancelBtn">キャンセル</button>
+                <button type="submit" class="btn-submit">追加</button>
+            </div>
+        </form>
             </section>
             
         </main>
         
     </div>
+    <form id="delete-form" method="POST" action="">
+        <input type="hidden" name="id" id="delete-todo-id">
+    </form>
 </body>
 </html>
 
-<script>
-    let add = document.getElementById("addTodo");
-    add.addEventListener("click", function() {
-    // todoListセクションの中にある<ul>を取得
-        const todoList = document.querySelector(".todoList ul");
-        console.log("1");
-
-        let newTodo = document.createElement("li");
-        console.log("2");
-
-        newTodo.textContent = "新しいToDo項目";
-        console.log("newTodo");
-
-    // ulに追加！
-        todoList.appendChild(newTodo);
-    });
-</script>
+<script src="../static/js/todo.js"></script>

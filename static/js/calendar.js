@@ -42,10 +42,20 @@ calendarHtml += '</tr></thead>'
 // ここまでで、曜日の部分を作成しています。
 
 calendarHtml += '<tbody class="date-number">'
-for (let j = 0; j < 5; j++) {
+for (let j = 0; j < 6; j++) {
     calendarHtml += '<tr>'
     for (let i = 0; i < 7; i++) {
-        calendarHtml += `<td><span>${7*j+i+1}</span></td>`
+        if (j === 0 && i < startDay) {
+            calendarHtml += `<td></td>`
+        } else if (dayCount > endDayCount) {
+            calendarHtml += `<td></td>`
+        } else if (dayCount === today) {
+            calendarHtml += `<td><span>${dayCount}</span></td>`
+            dayCount++
+        } else {
+            calendarHtml += `<td><span>${dayCount}</span></td>`
+            dayCount++
+        }
     }
     calendarHtml += '</tr>'
 }

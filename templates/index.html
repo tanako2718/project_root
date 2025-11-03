@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>予定管理アプリ - カレンダーとToDo</title>
-    <script src="../static/js/todo.js"></script>
     <style>
         .app-container {
             display: flex; /* 子要素（カレンダーとコンテンツエリア）を縦に並べる */
@@ -107,69 +106,7 @@
         
         <header class="calendar-area">
             <h2 style="text-align: center">2025年10月</h2>
-            <table class="calendar-table">
-                <thead>
-                    <tr>
-                        <th>日</th>
-                        <th>月</th>
-                        <th>火</th>
-                        <th>水</th>
-                        <th>木</th>
-                        <th>金</th>
-                        <th>土</th>
-                    </tr>
-                </thead>
-                <tbody class="date-number">
-                    <tr>
-                        <td>
-                            <span>29</span>
-                            <div class="schedule-entry">予定1</div>
-                        </td>
-                        <td><span>30</span></td>
-                        <td><span>1</span></td>
-                        <td><span>2</span></td>
-                        <td><span>3</span></td>
-                        <td><span>4</span></td>
-                        <td><span>5</span></td>
-                    </tr>
-                    <tr>
-                        <td>6</td>
-                        <td>7</td>
-                        <td>8</td>
-                        <td>9</td>
-                        <td>10</td>
-                        <td>11</td>
-                        <td>12</td>
-                    </tr>
-                    <tr>
-                        <td>13</td>
-                        <td>14</td>
-                        <td>15</td>
-                        <td>16</td>
-                        <td>17</td>
-                        <td>18</td>
-                        <td>19</td>
-                    </tr>
-                    <tr>
-                        <td>20</td>
-                        <td>21</td>
-                        <td>22</td>
-                        <td>23</td>
-                        <td>24</td>
-                        <td>25</td>
-                        <td>26</td>
-                    </tr>
-                    <tr>
-                        <td>27</td>
-                        <td>28</td>
-                        <td>29</td>
-                        <td>30</td>
-                        <td>31</td>
-                        <td>1</td>
-                        <td>2</td>
-                    </tr>
-                </tbody>
-            </table>
+            <table class="calendar-table"></table>
         </header>
 
         <main class="content-area">
@@ -241,7 +178,8 @@
     <form id="delete-form" method="POST" action="">
         <input type="hidden" name="id" id="delete-todo-id">
     </form>
-</body>
-</html>
-
 <script src="../static/js/todo.js"></script>
+<script src="../static/js/calendar.js"></script>
+</body>
+
+</html>

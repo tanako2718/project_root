@@ -1,3 +1,23 @@
+// Python (Flask) から渡されたスケジュールデータ
+// Jinja2の safe フィルターと tojson フィルターを使用して安全にJSONを埋め込み
+// 実際のアプリケーションでは、この行はindex.htmlのテンプレート内で動作します。
+// ここでは仮の値として空の配列を定義します。
+const scheduleData = typeof __schedule_data_json__ !== 'undefined' ? JSON.parse(__schedule_data_json__) : [];
+
+// スケジュールを日付 ('YYYY-MM-DD') で検索するためのマップを作成
+const schedulesByDate = scheduleData.reduce((acc, schedule) => {
+    const dateKey = schedule.starting_day;
+    if (!acc[dateKey]) {
+        acc[dateKey] = [];
+    }
+    // スケジュール内容を追加
+    acc[dateKey].push({
+        item: schedule.item,
+        content: schedule.content
+    });
+    return acc;
+}, {});
+
 const weeks = ['日', '月', '火', '水', '木', '金', '土']
 // 曜日を指定します。
 const date = new Date(); 
@@ -31,6 +51,7 @@ let dayCount = 1
 // 日にちのカウント 何日から始めるかを決めます。0にすると、カレンダーに0から始まります。
 
 let calendarHtml = '' // HTMLを組み立てる変数
+let scheduleHtml = '' // 予定をカレンダーに表示するための変数
 
 calendarHtml += '<thead><tr>'
 console.log(weeks)
@@ -64,6 +85,7 @@ calendarHtml += '</tbody>'
 console.log(calendarHtml)
 
 document.querySelector('.calendar-table').innerHTML = calendarHtml
+document.querySelector('.schedule-entry').innerHTML = scheduleHtml
 // ここの'.calendar'が、HTMLの<table class="calendar-table"></table>にあたります。
 // innerHTMLは、HTMLの中身を指定するプロパティです。
 // なので、calendarHtmlの中身を、calendar-tableクラスの中に入れています。

@@ -85,6 +85,16 @@ def index():
     
     # データベースからTodoを取得
     todos = Schedule.query.filter_by(users_id=user_id).order_by(Schedule.starting_day).all()
+
+    # スケジュールをJavaScriptに渡すために整形（日付をISO形式に）
+    schedule_data = []
+    for todo in todos:
+        schedule_data.append({
+            'id': todo.id,
+            'item': todo.item,
+            'content': todo.content,
+            'starting_day': todo.starting_day.isoformat() # Dateオブジェクトを 'YYYY-MM-DD' 形式の文字列に変換
+        })
     
     return render_template('index.html', todos=todos)
 

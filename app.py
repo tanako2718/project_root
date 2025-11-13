@@ -78,8 +78,28 @@ with app.app_context():
 
 # next_id = 4
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def login():
+    if request.method == 'POST':
+        # フォームからのデータ取得
+        mail_address = request.form.get('mailAddress')
+        password = request.form.get('password')
+        # メアドをもとにユーザーを検索
+        user = User.query.filter_by(mail_address=mail_address).first()
+        # バリデーション（必須項目のチェック）
+        if user:
+            target_user_id = user.user_id
+            print(f"Found user ID: {target_user_id}")
+            flash('ログイン成功', 'success')
+            return redirect(url_for('index', user_id=target_user_id))  # ログイン成功後、indexにリダイレクト
+        if not mail_address or not password:
+            flash('すべての項目を入力してください', 'error')
+            return redirect(url_for('login'))
+        else:
+            flash('メールアドレスが間違ってます', 'error')
+        
+        return redirect(url_for('login'))  # ログイン失敗、やり直し
+    # GETリクエスト（単にページを表示するとき）の処理
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -107,7 +127,7 @@ def register():
             new_user = User(
                 user_name=user_name,
                 mail_address=mail_address,
-                password=password # 現時点では平文で保存
+                password=password.generate_password_hash(password)  # ハッシュ化
             )
             db.session.add(new_user)
             db.session.commit()
@@ -125,11 +145,8 @@ def register():
     # GETリクエスト（単にページを表示するとき）の処理
     return render_template('register.html')
 
-@app.route('/index')
-def index():
-# 開発用：user_id=1を固定で使用
-    user_id = 1
-    
+@app.route('/index/<int:user_id>')
+def index(user_id):
     # データベースからTodoを取得
     todos = Schedule.query.filter_by(users_id=user_id).order_by(Schedule.starting_day).all()
 

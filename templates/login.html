@@ -6,9 +6,9 @@
  <title>ログイン</title>
 </head>
 <body>
-    <form action="" method="">
+    <form action="{{ url_for('login') }}" method='POST'>
     <div>
-        ユーザーID：<input type="text" name="userID">
+        メールアドレス：<input type="email" name="mailAddress">
     </div>
     <div>
         パスワード：<input type="password" name="password">

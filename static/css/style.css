@@ -9,8 +9,11 @@
 /* 上半分：カレンダーエリア */
 .calendar-area {
     flex: 1; /* 縦方向のスペースの1/2を使用 */
-    padding: 20px;
     border-bottom: 2px solid #333; /* 上下分割の線 */
+    display: flex; /* Flexboxコンテナにする */
+    flex-direction: column; /* 縦方向に配置 */
+    /* paddingによって高さがオーバーしないようにする */
+    box-sizing: border-box;
 }
 
 /* 下半分：コンテンツエリア */
@@ -21,24 +24,87 @@
 
 /* 左下：その日の予定 */
 .today-schedule {
-    flex: 1; /* 横方向のスペースの1/2を使用 */
-    padding: 20px;
-    border-right: 1px solid #ccc; /* 左右分割の線 */
-}
+            width: 50%; /* 横幅の50%を使用 */
+            flex: 1; /* 横方向のスペースの1/2を使用 */
+            border-right: 1px solid #ccc; /* 左右分割の線 */
+            white-space: nowrap; /* テキストの折り返しを有効にする */
+            overflow: hidden; /* はみ出した部分を隠す */
+            text-overflow: ellipsis; /* はみ出した部分を省略記号で表示 */
+        }
+
+        .today-schedule p {
+            white-space: nowrap;      /* テキストの折り返しを禁止 */
+            overflow: hidden;         /* はみ出した部分を隠す */
+            text-overflow: ellipsis;  /* 省略記号(...)を表示 */
+        }
 
 /* 右下：ToDoリスト */
-.todoList {
-    flex: 1; /* 横方向の残りの1/2を使用 */
-    padding: 20px;
-}
+        .todoList {
+            flex: 1; /* 横方向の残りの1/2を使用 */
+        }
 
 /* カレンダーの基本的なスタイル */
-.calendar-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-.calendar-table th, .calendar-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
-}
+        .calendar-table {
+            table-layout: fixed;
+            width: 100%;
+            border-collapse: collapse;
+            flex-grow: 1; /* 縦方向の残りのスペースを全て占有する */
+        }
+        .calendar-table th, .calendar-table td {
+            table-layout: fixed;
+            border: 5px solid #ddd;
+            padding: 8px;
+            height: 0;
+        }
+        /* テーブルの行も高さも均等に分配する */
+        .calendar-table tbody tr {
+            table-layout: fixed;
+            flex-grow: 1;
+    /* CSS Gridでは display: grid; grid-template-rows: repeat(5, 1fr); を table に適用できるが、
+       テーブル要素では非推奨のため、Flexboxで代替する。 */
+        }
+        .calendar-table tbody tr td {
+            table-layout: fixed;
+            text-align: initial; /* 日付を左寄せにする */
+            justify-content: flex-start; /* 左寄せ */
+            position: relative; /* 基準位置とする */
+            padding-top: 20px; /* 日付を置くスペースを確保するためにパディングを増やす */
+            text-align: center; /* 予定コンテンツを中央寄せにする場合 */
+        }
+
+/* 見出しのスペース調整 */
+        .calendar-area h2 {
+            margin-top: 0; /* 上部の隙間をなくす */
+        }
+        .date-number tr td span{
+            position: absolute; /* 親要素（td）を基準に絶対配置 */
+            top: 5px; /* 上端から5px */
+            left: 5px; /* 左端から5px */
+            font-size: 0.7em;
+            font-weight: bold;
+            color: #555;
+        }
+        .schedule-entry {
+            background-color: #f0f8ff;
+            width: auto;
+            margin-top: 0px;
+            padding: 0px 0px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .schedule-entry p {
+            margin: 2px 4px;
+        }
+        .loginBtn {
+            background-color: #4CAF50; /* 緑色の背景 */
+            border: none; /* 枠線なし */
+            color: white; /* 文字色を白に */
+            padding: 10px 20px; /* 上下10px、左右20pxの余白 */
+            text-align: center; /* 文字を中央揃え */
+            text-decoration: none; /* 下線なし */
+            display: inline-block; /* インラインブロック要素にする */
+            font-size: 16px; /* フォントサイズ */
+            margin: 4px 2px; /* 外側の余白 */
+            cursor: pointer; /* カーソルをポインターに変更 */
+            border-radius: 8px; /* 角を丸くする */
+        }

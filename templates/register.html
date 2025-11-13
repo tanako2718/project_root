@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>新規登録</title>
+</head>
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <h2>新規登録フォーム</h2>
+    <form action="{{ url_for('register') }}" method="POST">
+    <div>
+        ユーザー名：<input type="text" name="userName" required> 
+    </div>
+    <div>
+        メールアドレス：<input type="email" name="mailAddress" required>
+    </div>
+    <div>
+        パスワード：<input type="password" name="password" required>
+    </div>
+  <input type="submit" value="登録" class="registerBtn">
+ </form>
+    <a href="{{ url_for('login') }}">ログインはこちら</a>
+</body>
+</html>

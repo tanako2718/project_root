@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>ログイン</title>
+</head>
+<body>
+    <form action="" method="">
+    <div>
+        ユーザーID：<input type="text" name="userID">
+    </div>
+    <div>
+        パスワード：<input type="password" name="password">
+    </div>
+  <input type="submit" value="ログイン" class="loginBtn">
+ </form>
+ <!-- 以下のaタグのhref属性が重要 -->
+ <a href="{{ url_for('register') }}">新規登録はこちら</a>
+</body>
+</html>

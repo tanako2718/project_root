@@ -79,6 +79,53 @@ with app.app_context():
 # next_id = 4
 
 @app.route('/')
+def login():
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    # POSTリクエスト（フォームが送信されたとき）の処理
+    if request.method == 'POST':
+        # フォームからのデータ取得
+        user_name = request.form.get('userName')
+        mail_address = request.form.get('mailAddress')
+        password = request.form.get('password')
+        
+        # 1. バリデーション（必須項目のチェック）
+        if not user_name or not mail_address or not password:
+            flash('すべての項目を入力してください', 'error')
+            return redirect(url_for('register'))
+            
+        # 2. メールアドレスの重複チェック
+        if User.query.filter_by(mail_address=mail_address).first():
+            flash('そのメールアドレスはすでに使用されています', 'error')
+            return redirect(url_for('register'))
+
+        # 3. ユーザーオブジェクトを作成し、DBに保存
+        try:
+            # 【重要】本番環境では必ずpasswordをハッシュ化してください（例：werkzeug.securityのgenerate_password_hashを使用）
+            new_user = User(
+                user_name=user_name,
+                mail_address=mail_address,
+                password=password # 現時点では平文で保存
+            )
+            db.session.add(new_user)
+            db.session.commit()
+            
+            flash('登録が完了しました。ログインしてください', 'success')
+            # 登録成功後、ログインページにリダイレクトすることを想定
+            return redirect(url_for('index')) # 便宜上indexにリダイレクト
+            
+        except Exception as e:
+            db.session.rollback()
+            flash('登録中にエラーが発生しました', 'error')
+            print(f"Error: {e}")
+            return redirect(url_for('register'))
+            
+    # GETリクエスト（単にページを表示するとき）の処理
+    return render_template('register.html')
+
+@app.route('/index')
 def index():
 # 開発用：user_id=1を固定で使用
     user_id = 1
@@ -96,7 +143,7 @@ def index():
             'starting_day': todo.starting_day.isoformat() # Dateオブジェクトを 'YYYY-MM-DD' 形式の文字列に変換
         })
     
-    return render_template('index.html', todos=todos)
+    return render_template('index.html', todos=todos, schedule_data=schedule_data) # schedule_dataもindex.htmlに渡す
 
 # Todo追加
 @app.route('/todo/add', methods=['POST'])

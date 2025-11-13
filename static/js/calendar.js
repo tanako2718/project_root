@@ -2,7 +2,9 @@
 // Jinja2の safe フィルターと tojson フィルターを使用して安全にJSONを埋め込み
 // 実際のアプリケーションでは、この行はindex.htmlのテンプレート内で動作します。
 // ここでは仮の値として空の配列を定義します。
-const scheduleData = typeof __schedule_data_json__ !== 'undefined' ? JSON.parse(__schedule_data_json__) : [];
+const scheduleData = typeof
+__schedule_data_json__ !== 'undefined' ?
+__schedule_data_json__ : [];
 
 // スケジュールを日付 ('YYYY-MM-DD') で検索するためのマップを作成
 const schedulesByDate = scheduleData.reduce((acc, schedule) => {
@@ -70,12 +72,27 @@ for (let j = 0; j < 6; j++) {
             calendarHtml += `<td></td>`
         } else if (dayCount > endDayCount) {
             calendarHtml += `<td></td>`
-        } else if (dayCount === today) {
-            calendarHtml += `<td><span>${dayCount}</span></td>`
-            dayCount++
         } else {
-            calendarHtml += `<td><span>${dayCount}</span></td>`
-            dayCount++
+            // 【追加】日付のキーを作成 (YYYY-MM-DD形式)
+            const dateKey = `${year}-${String(month).padStart(2, '0')}-${String(dayCount).padStart(2, '0')}`;
+            
+            // 【追加】その日の予定を取得
+            const daySchedules = schedulesByDate[dateKey] || [];
+            
+            // 予定のHTMLを生成
+            let scheduleHtml = '';
+            daySchedules.forEach((schedule, index) => {
+                const entryHtml = `<div class="schedule-entry">${schedule.content}</div>`;
+                scheduleHtml += entryHtml;
+            });
+            
+            // 【追加】今日かどうかをチェック
+            const isToday = dayCount === today;
+            const todayClass = isToday ? ' class="today"' : '';
+
+            // 今日のクラスと予定HTMLを追加
+            calendarHtml += `<td${todayClass}><span>${dayCount}</span>${scheduleHtml}</td>`;
+            dayCount++;
         }
     }
     calendarHtml += '</tr>'
@@ -85,7 +102,6 @@ calendarHtml += '</tbody>'
 console.log(calendarHtml)
 
 document.querySelector('.calendar-table').innerHTML = calendarHtml
-document.querySelector('.schedule-entry').innerHTML = scheduleHtml
 // ここの'.calendar'が、HTMLの<table class="calendar-table"></table>にあたります。
 // innerHTMLは、HTMLの中身を指定するプロパティです。
 // なので、calendarHtmlの中身を、calendar-tableクラスの中に入れています。

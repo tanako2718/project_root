@@ -4,103 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>予定管理アプリ - カレンダーとToDo</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <style>
-        .app-container {
-            display: flex; /* 子要素（カレンダーとコンテンツエリア）を縦に並べる */
-            flex-direction: column; /* 縦方向の配置を指定 */
-            height: 100vh; /* 画面いっぱいの高さを使用 */
-            max-width: 800px;
-            margin: 0 auto; /* 中央寄せ */
-        }
-
-/* 上半分：カレンダーエリア */
-        .calendar-area {
-            flex: 1; /* 縦方向のスペースの1/2を使用 */
-            border-bottom: 2px solid #333; /* 上下分割の線 */
-            display: flex; /* Flexboxコンテナにする */
-            flex-direction: column; /* 縦方向に配置 */
-            /* paddingによって高さがオーバーしないようにする */
-            box-sizing: border-box;
-        }
-
-/* 下半分：コンテンツエリア */
-        .content-area {
-            flex: 1; /* 縦方向の残りの1/2を使用 */
-            display: flex; /* 子要素（予定とToDo）を横に並べる */
-        }
-
-/* 左下：その日の予定 */
-        .today-schedule {
-            width: 50%; /* 横幅の50%を使用 */
-            flex: 1; /* 横方向のスペースの1/2を使用 */
-            border-right: 1px solid #ccc; /* 左右分割の線 */
-            white-space: nowrap; /* テキストの折り返しを有効にする */
-            overflow: hidden; /* はみ出した部分を隠す */
-            text-overflow: ellipsis; /* はみ出した部分を省略記号で表示 */
-        }
-
-        .today-schedule p {
-            white-space: nowrap;      /* テキストの折り返しを禁止 */
-            overflow: hidden;         /* はみ出した部分を隠す */
-            text-overflow: ellipsis;  /* 省略記号(...)を表示 */
-        }
-
-/* 右下：ToDoリスト */
-        .todoList {
-            flex: 1; /* 横方向の残りの1/2を使用 */
-        }
-
-/* カレンダーの基本的なスタイル */
-        .calendar-table {
-            table-layout: fixed;
-            width: 100%;
-            border-collapse: collapse;
-            flex-grow: 1; /* 縦方向の残りのスペースを全て占有する */
-        }
-        .calendar-table th, .calendar-table td {
-            table-layout: fixed;
-            border: 5px solid #ddd;
-            padding: 8px;
-            height: 0;
-        }
-        /* テーブルの行も高さも均等に分配する */
-        .calendar-table tbody tr {
-            table-layout: fixed;
-            flex-grow: 1;
-    /* CSS Gridでは display: grid; grid-template-rows: repeat(5, 1fr); を table に適用できるが、
-       テーブル要素では非推奨のため、Flexboxで代替する。 */
-        }
-        .calendar-table tbody tr td {
-            table-layout: fixed;
-            text-align: initial; /* 日付を左寄せにする */
-            justify-content: flex-start; /* 左寄せ */
-            position: relative; /* 基準位置とする */
-            padding-top: 20px; /* 日付を置くスペースを確保するためにパディングを増やす */
-            text-align: center; /* 予定コンテンツを中央寄せにする場合 */
-        }
-
-/* 見出しのスペース調整 */
-        .calendar-area h2 {
-            margin-top: 0; /* 上部の隙間をなくす */
-        }
-        .date-number tr td span{
-            position: absolute; /* 親要素（td）を基準に絶対配置 */
-            top: 5px; /* 上端から5px */
-            left: 5px; /* 左端から5px */
-            font-size: 0.7em;
-            font-weight: bold;
-            color: #555;
-        }
-        .schedule-entry {
-            background-color: #f0f8ff;
-            width: auto;
-            margin-top: 0px;
-            padding: 0px 0px;
-            border-radius: 4px;
-            font-size: 0.9em;
-        }
-    </style>
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous"> -->
+    <link rel="stylesheet" href="../static/css/style.css">
 </head>
 <body>
     <div class="app-container">
@@ -180,7 +85,7 @@
     <form id="delete-form" method="POST" action="">
         <input type="hidden" name="id" id="delete-todo-id">
     </form>
-    <div class="row center-block text-center">
+    <!-- <div class="row center-block text-center">
             <div class="col-1">
             </div>
             <div class="col-5">
@@ -189,12 +94,16 @@
             <div class="col-5">
                 <button type="button" class="btn btn-outline-primary btn-block">新規登録</button>
             </div>
-        </div>
+        </div> -->
+    <script>
+        // FlaskからスケジュールデータをJavaScriptに渡す
+        const __schedule_data_json__ = JSON.parse('{{ schedule_data | tojson | safe }}');
+    </script>
     <script src="../static/js/todo.js"></script>
     <script src="../static/js/calendar.js"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script> -->
 </body>
 
 </html>

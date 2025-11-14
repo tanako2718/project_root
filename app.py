@@ -1,6 +1,9 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin, LoginManager, login_user, current_user, login_required
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-change-this'
@@ -9,22 +12,30 @@ app.secret_key = 'your-secret-key-change-this'
 # 形式: postgresql://ユーザー名:パスワード@ホスト:ポート/データベース名
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Tanako1146@localhost:5432/todo_calendar_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = os.urandom(24)
+
+# Flask-Loginの設定
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 db = SQLAlchemy(app)
 
 # ========== モデル定義 ==========
-class User(db.Model):
-    __tablename__ = 'user'
+class User(UserMixin, db.Model):
+    __tablename__ = 'users'
     user_id = db.Column(db.Integer, primary_key=True)
     user_name = db.Column(db.String(100), nullable=False)
     mail_address = db.Column(db.String(200), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
-    schedules = db.relationship('Schedule', backref='user', lazy=True, cascade='all, delete-orphan')
+    schedules = db.relationship('Schedule', backref='users', lazy=True, cascade='all, delete-orphan')
+
+    def get_id(self):
+        return str(self.user_id)
 
 class Schedule(db.Model):
-    __tablename__ = 'schedule'
+    __tablename__ = 'schedules'
     id = db.Column(db.Integer, primary_key=True)
-    users_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
+    users_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     item = db.Column(db.String(50), nullable=False)
     content = db.Column(db.String(200), nullable=False)
     detail = db.Column(db.Text)
@@ -35,49 +46,17 @@ class Schedule(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+# ========== Flask-Login設定 ==========
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
 # ========== データベース初期化 ==========
 with app.app_context():
     db.create_all()
     print("データベーステーブルを作成しました")
-    
-    # 開発用テストユーザーの作成（初回のみ）
-    if User.query.count() == 0:
-        test_user = User(
-            user_name='テストユーザー',
-            mail_address='test@example.com',
-            password='test123'  # 本番環境ではハッシュ化必須
-        )
-        db.session.add(test_user)
-        db.session.commit()
-        print("テストユーザーを作成しました")
 
-#dammy data
-# todos = [
-#     {
-#         'id': 1,
-#         'item': '学業',
-#         'content': '数学の課題提出',
-#         'detail': '微分積分の問題集 p.45-52',
-#         'starting_day': date(2025, 10, 20)
-#     },
-#     {
-#         'id': 2,
-#         'item': 'バイト',
-#         'content': 'カフェバイト',
-#         'detail': '夕方シフト 17:00-21:00',
-#         'starting_day': date(2025, 10, 18)
-#     },
-#     {
-#         'id': 3,
-#         'item': 'サークル',
-#         'content': 'サークルミーティング',
-#         'detail': '新歓イベントの企画会議',
-#         'starting_day': date(2025, 10, 22)
-#     }
-# ]
-
-# next_id = 4
-
+# ========== ルーティング ==========
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -87,11 +66,14 @@ def login():
         # メアドをもとにユーザーを検索
         user = User.query.filter_by(mail_address=mail_address).first()
         # バリデーション（必須項目のチェック）
-        if user:
-            target_user_id = user.user_id
-            print(f"Found user ID: {target_user_id}")
-            flash('ログイン成功', 'success')
-            return redirect(url_for('index', user_id=target_user_id))  # ログイン成功後、indexにリダイレクト
+#        if user:
+#           target_user_id = user.user_id
+#            print(f"Found user ID: {target_user_id}")
+#            flash('ログイン成功', 'success')
+#            return redirect(url_for('index', user_id=target_user_id))  # ログイン成功後、indexにリダイレクト
+        if user and check_password_hash(user.password, password):
+            login_user(user)  # ユーザーをログインさせる
+            return redirect('index')
         if not mail_address or not password:
             flash('すべての項目を入力してください', 'error')
             return redirect(url_for('login'))
@@ -120,21 +102,22 @@ def register():
         if User.query.filter_by(mail_address=mail_address).first():
             flash('そのメールアドレスはすでに使用されています', 'error')
             return redirect(url_for('register'))
+        
+        password_hash = generate_password_hash(password)  # ハッシュ化
 
         # 3. ユーザーオブジェクトを作成し、DBに保存
         try:
-            # 【重要】本番環境では必ずpasswordをハッシュ化してください（例：werkzeug.securityのgenerate_password_hashを使用）
             new_user = User(
                 user_name=user_name,
                 mail_address=mail_address,
-                password=password.generate_password_hash(password)  # ハッシュ化
+                password=password_hash # コードの保守性と見やすさのための変数使用
             )
             db.session.add(new_user)
             db.session.commit()
             
             flash('登録が完了しました。ログインしてください', 'success')
             # 登録成功後、ログインページにリダイレクトすることを想定
-            return redirect(url_for('index')) # 便宜上indexにリダイレクト
+            return redirect(url_for('login')) # 便宜上indexにリダイレクト
             
         except Exception as e:
             db.session.rollback()
@@ -145,10 +128,11 @@ def register():
     # GETリクエスト（単にページを表示するとき）の処理
     return render_template('register.html')
 
-@app.route('/index/<int:user_id>')
-def index(user_id):
+@app.route('/index')
+@login_required
+def index():
     # データベースからTodoを取得
-    todos = Schedule.query.filter_by(users_id=user_id).order_by(Schedule.starting_day).all()
+    todos = Schedule.query.filter_by(users_id=current_user.user_id).order_by(Schedule.starting_day).all()
 
     # スケジュールをJavaScriptに渡すために整形（日付をISO形式に）
     schedule_data = []
@@ -164,9 +148,9 @@ def index(user_id):
 
 # Todo追加
 @app.route('/todo/add', methods=['POST'])
+@login_required
 def add_todo():
-    user_id = 1  # 開発用の仮ユーザーID
-    
+
     item = request.form.get('item')
     content = request.form.get('content')
     detail = request.form.get('detail')
@@ -179,7 +163,7 @@ def add_todo():
     
     try:
         new_todo = Schedule(
-            users_id=user_id,
+            users_id=current_user.user_id,
             item=item,
             content=content,
             detail=detail,
@@ -196,13 +180,13 @@ def add_todo():
     return redirect(url_for('index'))
 
 @app.route('/todo/delete/<int:todo_id>')
+@login_required
 def delete_todo(todo_id):
-    user_id = 1  # 開発用の仮ユーザーID
-    
+
     todo = Schedule.query.get_or_404(todo_id)
     
     # 自分のTodoか確認
-    if todo.users_id != user_id:
+    if todo.users_id != current_user.user_id:
         flash('権限がありません', 'error')
         return redirect(url_for('index'))
     

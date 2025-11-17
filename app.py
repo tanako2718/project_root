@@ -73,7 +73,7 @@ def login():
 #            return redirect(url_for('index', user_id=target_user_id))  # ログイン成功後、indexにリダイレクト
         if user and check_password_hash(user.password, password):
             login_user(user)  # ユーザーをログインさせる
-            return redirect('index')
+            return redirect('index.html')
         if not mail_address or not password:
             flash('すべての項目を入力してください', 'error')
             return redirect(url_for('login'))

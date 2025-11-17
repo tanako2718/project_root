@@ -11,9 +11,17 @@
     <div class="app-container">
         
         <header class="calendar-area">
-            <h2 style="text-align: center">2025年11月</h2>
+            <span style="text-align: left;">
+                <button onclick="location.href='{{ url_for('logout') }}'">ログアウト</button>
+            </span>
+            <span>
+                <h2 style="text-align: center"></h2>
+            </span>
+            <span style="text-align: right;">
+                <button id="prevMonthBtn">&lt;</button>
+                <button id="nextMonthBtn">&gt;</button>
+            </span>
             <table class="calendar-table"></table>
-            <!-- <div class="schedule-entry">予定1</div> -->
         </header>
 
         <main class="content-area">

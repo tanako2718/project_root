@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin, LoginManager, login_user, current_user, login_required
+from flask_login import UserMixin, LoginManager, login_user, current_user, login_required, logout_user
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-change-this'
@@ -73,8 +73,8 @@ def login():
 #            return redirect(url_for('index', user_id=target_user_id))  # ログイン成功後、indexにリダイレクト
         if user and check_password_hash(user.password, password):
             login_user(user)  # ユーザーをログインさせる
-            return redirect('index.html')
-        if not mail_address or not password:
+            return redirect('index')
+        elif not mail_address or not password:
             flash('すべての項目を入力してください', 'error')
             return redirect(url_for('login'))
         else:
@@ -200,6 +200,13 @@ def delete_todo(todo_id):
         print(f"Error: {e}")
     
     return redirect(url_for('index'))
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('ログアウトしました', 'success')
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     app.run(debug=True)

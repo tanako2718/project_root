@@ -10,9 +10,24 @@ app.secret_key = 'your-secret-key-change-this'
 # ========== データベース設定 ==========
 # PostgreSQL接続設定
 # 形式: postgresql://ユーザー名:パスワード@ホスト:ポート/データベース名
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Tanako1146@localhost:5432/todo_calendar_db'
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    # Renderなどの本番環境
+    # DATABASE_URLが 'postgres://' で始まる場合、'postgresql://' に変換
+    if DATABASE_URL.startswith('postgres://'):
+        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+else:
+    # ローカル開発環境
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Tanako1146@localhost:5432/todo_calendar_db'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.urandom(24)
+
+# SECRET_KEYも環境変数から取得（本番環境では必須）
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', os.urandom(24))
+
+
 
 # Flask-Loginの設定
 login_manager = LoginManager()
@@ -209,4 +224,7 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # 本番環境ではポート番号を環境変数から取得
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
+

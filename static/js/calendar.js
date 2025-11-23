@@ -109,6 +109,33 @@ function renderCalendar(year, month) {
 // ちなみに、querySelectorは、CSSセレクタで要素を取得するメソッドです。
 // 例えば、document.querySelector('#id名')や、document.querySelector('.class名')のように使います。
 
+function updateTodayScheduleList() {
+    if (!todayScheduleUl) return; // 要素がなければ何もしない
+
+    // 1. 今日の日付のキーを作成 (YYYY-MM-DD)
+    const year = todayDate.getFullYear();
+    const month = todayDate.getMonth() + 1;
+    const day = todayDate.getDate();
+    const dateKey = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    
+    // 2. 今日の予定を取得
+    const todaySchedules = schedulesByDate[dateKey] || [];
+    
+    // 3. リストHTMLを生成
+    let listHtml = '';
+    if (todaySchedules.length > 0) {
+        todaySchedules.forEach(schedule => {
+            // <li>要素として表示
+            listHtml += `<li><span class="schedule-item-type">【${schedule.item}】</span> ${schedule.content}</li>`;
+        });
+    } else {
+        listHtml = '<li>今日の予定はありません。</li>';
+    }
+    
+    // 4. DOMを更新
+    todayScheduleUl.innerHTML = listHtml;
+}
+
 // 4. 月切り替え関数
 function changeMonth(delta) {
     currentMonth += delta;
@@ -133,4 +160,6 @@ nextButton.addEventListener('click', () => changeMonth(1));  // 1: 次月へ
 document.addEventListener('DOMContentLoaded', () => {
     // index.htmlから渡された初期値（現在は2025年11月）を上書き
     renderCalendar(currentYear, currentMonth); 
+
+    updateTodayScheduleList();
 });

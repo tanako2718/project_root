@@ -71,6 +71,29 @@
             padding-top: 20px; /* 日付を置くスペースを確保するためにパディングを増やす */
             text-align: center; /* 予定コンテンツを中央寄せにする場合 */
         }
+/* 各セルの高さを固定し、内容がはみ出た場合の表示方法を指定 */
+.calendar-table td {
+    /* 必須: セルの高さを固定する */
+    height: 4vh; /* 画面高さの1/6（6行の場合） */
+    
+    /* 必須: 内容がセルからはみ出た場合にスクロール可能にするか、隠すかを指定 */
+    overflow: hidden; 
+    /* 予定が多い場合は 'scroll' や 'auto' に変更することも検討 */
+    
+    /* セルの内容を上から詰めて表示するために、相対位置指定をしておく */
+    position: relative;
+    
+    /* 縦方向のテキストベースラインを合わせる (通常は必要ないが念のため) */
+    vertical-align: top; 
+}
+
+/* 日付の数字を上部に固定 */
+.calendar-table td span {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    z-index: 10; /* 予定の上に日付が来るように */
+}
 
 /* 見出しのスペース調整 */
         .calendar-area h2 {
